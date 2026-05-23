@@ -1,0 +1,32 @@
+@page
+@model ProjectManagement.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<section class="auth-panel">
+    <h1>Login</h1>
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <p class="success-message">@successMessage</p>
+    }
+    <form method="post" class="form-stack" data-auth-form="login" novalidate>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" autocomplete="username" inputmode="email" />
+        <span asp-validation-for="Input.Email" class="field-error"></span>
+
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" autocomplete="current-password" />
+        <span asp-validation-for="Input.Password" class="field-error"></span>
+
+        <label class="inline-check">
+            <input asp-for="Input.RememberMe" />
+            <span>Remember me</span>
+        </label>
+
+        <button type="submit" class="primary-button">Login</button>
+    </form>
+    <p class="muted">New user? <a asp-page="/Account/Register">Create an account</a>.</p>
+</section>

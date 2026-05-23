@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Project Management</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" asp-page="/Index">Project Management</a>
+        <nav class="nav">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                @if (User.IsInRole(RoleNames.Admin))
+                {
+                    <a asp-page="/Index">Dashboard</a>
+                }
+                @if (User.IsInRole(RoleNames.Employee))
+                {
+                    <a asp-page="/Employees/MyTasks">My Tasks</a>
+                }
+                <span class="user-chip">@User.Identity.Name</span>
+                <form asp-page="/Account/Logout" method="post">
+                    <button type="submit" class="link-button">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a asp-page="/Account/Login">Login</a>
+                <a asp-page="/Account/Register">Register</a>
+            }
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        @RenderBody()
+    </main>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

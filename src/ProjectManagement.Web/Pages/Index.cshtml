@@ -1,0 +1,77 @@
+@page
+@model ProjectManagement.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="page-heading">
+    <div>
+        <h1>Dashboard</h1>
+        <p>Project progress and workload summary.</p>
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <span>Total projects</span>
+        <strong>@Model.Dashboard.TotalProjects</strong>
+    </article>
+    <article class="stat-card">
+        <span>Average progress</span>
+        <strong>@Model.Dashboard.AverageProgressPercentage%</strong>
+    </article>
+</section>
+
+@if (User.IsInRole(RoleNames.Admin))
+{
+    <section class="panel">
+        <div class="panel-heading">
+            <h2>Create project</h2>
+        </div>
+        <form class="form-grid" data-create-project>
+            <label>
+                Name
+                <input name="name" maxlength="120" required />
+            </label>
+            <label>
+                Description
+                <textarea name="description" maxlength="1000"></textarea>
+            </label>
+            <button type="submit" class="primary-button">Create</button>
+        </form>
+    </section>
+}
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Projects</h2>
+    </div>
+
+    @if (Model.Dashboard.Projects.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No projects yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="project-list">
+            @foreach (var project in Model.Dashboard.Projects)
+            {
+                <a class="project-row" asp-page="/Projects/Details" asp-route-id="@project.Id">
+                    <div>
+                        <strong>@project.Name</strong>
+                        <span>@project.Description</span>
+                    </div>
+                    <div class="progress-block">
+                        <span>@project.CompletedTaskCount / @project.TaskCount tasks</span>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width:@project.ProgressPercentage%"></div>
+                        </div>
+                        <b>@project.ProgressPercentage%</b>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</section>

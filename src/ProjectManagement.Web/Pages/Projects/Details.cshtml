@@ -1,0 +1,97 @@
+@page "{id:guid}"
+@model ProjectManagement.Web.Pages.Projects.DetailsModel
+@{
+    ViewData["Title"] = Model.Project.Name;
+}
+
+<section class="page-heading">
+    <div>
+        <h1>@Model.Project.Name</h1>
+        <p>@Model.Project.Description</p>
+    </div>
+    <div class="summary-pill">@Model.Project.ProgressPercentage% complete</div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <span>Total tasks</span>
+        <strong>@Model.Project.TaskCount</strong>
+    </article>
+    <article class="stat-card">
+        <span>Completed</span>
+        <strong>@Model.Project.CompletedTaskCount</strong>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Create task</h2>
+    </div>
+    <form class="form-grid" data-create-task data-project-id="@Model.Project.Id">
+        <label>
+            Title
+            <input name="title" maxlength="160" required />
+        </label>
+        <label>
+            Assign to
+            <select name="assignedEmployeeId" required>
+                <option value="">Select employee</option>
+                @foreach (var employee in Model.Employees)
+                {
+                    <option value="@employee.Id">@employee.Name (@employee.Email)</option>
+                }
+            </select>
+        </label>
+        <label class="wide-field">
+            Description
+            <textarea name="description" maxlength="1000"></textarea>
+        </label>
+        <button type="submit" class="primary-button">Create task</button>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Tasks</h2>
+    </div>
+
+    @if (Model.Project.Tasks.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No tasks have been created for this project.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Status</th>
+                        <th>Employee</th>
+                        <th>Created</th>
+                        <th>Started</th>
+                        <th>Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model.Project.Tasks)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@task.Title</strong>
+                                <span>@task.Description</span>
+                            </td>
+                            <td><span class="status status-@task.Status">@task.Status</span></td>
+                            <td>@task.AssignedEmployeeName</td>
+                            <td>@task.CreatedAt.LocalDateTime.ToString("g")</td>
+                            <td>@(task.StartedAt?.LocalDateTime.ToString("g") ?? "-")</td>
+                            <td>@(task.CompletedAt?.LocalDateTime.ToString("g") ?? "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

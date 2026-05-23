@@ -1,0 +1,60 @@
+@page
+@model ProjectManagement.Web.Pages.Employees.MyTasksModel
+@{
+    ViewData["Title"] = "My Tasks";
+}
+
+<section class="page-heading">
+    <div>
+        <h1>My Tasks</h1>
+        <p>Tasks assigned to you.</p>
+    </div>
+</section>
+
+<section class="panel">
+    @if (Model.Tasks.Count == 0)
+    {
+        <div class="empty-state">
+            <p>You do not have assigned tasks yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="task-grid">
+            @foreach (var task in Model.Tasks)
+            {
+                <article class="task-card">
+                    <div>
+                        <span class="status status-@task.Status">@task.Status</span>
+                        <h2>@task.Title</h2>
+                        <p>@task.Description</p>
+                    </div>
+                    <dl>
+                        <div>
+                            <dt>Created</dt>
+                            <dd>@task.CreatedAt.LocalDateTime.ToString("g")</dd>
+                        </div>
+                        <div>
+                            <dt>Started</dt>
+                            <dd>@(task.StartedAt?.LocalDateTime.ToString("g") ?? "-")</dd>
+                        </div>
+                        <div>
+                            <dt>Completed</dt>
+                            <dd>@(task.CompletedAt?.LocalDateTime.ToString("g") ?? "-")</dd>
+                        </div>
+                    </dl>
+                    <div class="row-actions">
+                        @if (task.Status == TaskWorkflowStatus.Todo)
+                        {
+                            <button type="button" data-task-status="@task.Id" data-status="InProgress" data-row-version="@task.RowVersion">Start</button>
+                        }
+                        @if (task.Status == TaskWorkflowStatus.InProgress)
+                        {
+                            <button type="button" data-task-status="@task.Id" data-status="Done" data-row-version="@task.RowVersion">Done</button>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>
