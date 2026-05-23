@@ -42,21 +42,6 @@ Admin Password: Admin@123
 
 Public registration from `/Account/Register` creates Employee accounts and redirects to `/Account/Login`.
 
-## Swagger
-
-In Development environment, Swagger is available at:
-
-```text
-/swagger
-```
-
-Use Swagger to test these API endpoints after login/authentication setup:
-
-- `POST /api/projects`
-- `POST /api/projects/{projectId}/tasks`
-- `PUT /api/tasks/{taskId}`
-- `PATCH /api/tasks/{taskId}/status`
-
 ## Database
 
 The app applies the included SQL Server migration and creates required Identity roles/Admin user on startup.
