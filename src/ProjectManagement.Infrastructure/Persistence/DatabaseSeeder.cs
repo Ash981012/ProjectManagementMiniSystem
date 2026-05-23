@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using ProjectManagement.Domain.Users;
 using ProjectManagement.Infrastructure.Identity;
 
@@ -18,13 +19,21 @@ public static class DatabaseSeeder
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+        var adminEmail = configuration["DefaultAdmin:Email"];
+        var adminPassword = configuration["DefaultAdmin:Password"];
+
+        if (string.IsNullOrWhiteSpace(adminEmail))
+            throw new InvalidOperationException("Default admin email is not configured. Set 'DefaultAdmin:Email' in configuration or secrets.");
+
+        if (string.IsNullOrWhiteSpace(adminPassword))
+            throw new InvalidOperationException("Default admin password is not configured. Set 'DefaultAdmin:Password' in configuration or secrets.");
+
         await EnsureRoleAsync(roleManager, RoleNames.Admin);
         await EnsureRoleAsync(roleManager, RoleNames.Employee);
-        await EnsureAdminUserAsync(userManager);
+        await EnsureAdminUserAsync(userManager, adminEmail, adminPassword);
     }
-
-    private const string DefaultAdminEmail = "admin@pms.com";
-    private const string DefaultAdminPassword = "Admin@123";
 
     private static async Task EnsureRoleAsync(RoleManager<IdentityRole> roleManager, string role)
     {
@@ -35,21 +44,21 @@ public static class DatabaseSeeder
         }
     }
 
-    private static async Task EnsureAdminUserAsync(UserManager<ApplicationUser> userManager)
+    private static async Task EnsureAdminUserAsync(UserManager<ApplicationUser> userManager, string adminEmail, string adminPassword)
     {
-        var admin = await userManager.FindByEmailAsync(DefaultAdminEmail);
+        var admin = await userManager.FindByEmailAsync(adminEmail);
 
         if (admin is null)
         {
             admin = new ApplicationUser
             {
-                UserName = DefaultAdminEmail,
-                Email = DefaultAdminEmail,
+                UserName = adminEmail,
+                Email = adminEmail,
                 EmailConfirmed = true,
                 FullName = "System Administrator"
             };
 
-            var createResult = await userManager.CreateAsync(admin, DefaultAdminPassword);
+            var createResult = await userManager.CreateAsync(admin, adminPassword);
             ThrowIfFailed(createResult, "Could not create default admin user.");
         }
 
