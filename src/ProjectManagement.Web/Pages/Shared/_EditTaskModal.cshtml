@@ -1,0 +1,20 @@
+@* Simple modal partial for editing task details *@
+<div id="editTaskModal" class="modal" aria-hidden="true" style="display:none;">
+    <div class="modal-content">
+        <header>
+            <h2>Edit Task</h2>
+            <button type="button" data-close-modal>&times;</button>
+        </header>
+        <form id="editTaskForm">
+            <input type="hidden" name="rowVersion" />
+            <input type="hidden" name="taskId" />
+            <label>Title<input name="title" required maxlength="160" /></label>
+            <label>Assigned employee<select name="assignedEmployeeId"></select></label>
+            <label>Description<textarea name="description" maxlength="1000"></textarea></label>
+            <div class="actions">
+                <button type="submit" class="primary-button">Save</button>
+                <button type="button" data-close-modal>Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

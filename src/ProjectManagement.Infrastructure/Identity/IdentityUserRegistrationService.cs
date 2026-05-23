@@ -15,12 +15,15 @@ public sealed class IdentityUserRegistrationService(UserManager<ApplicationUser>
     {
         cancellationToken.ThrowIfCancellationRequested();
 
+        var trimmedFullName = fullName?.Trim() ?? string.Empty;
+        var trimmedEmail = email?.Trim() ?? string.Empty;
+
         var user = new ApplicationUser
         {
-            UserName = email,
-            Email = email,
+            UserName = trimmedEmail,
+            Email = trimmedEmail,
             EmailConfirmed = true,
-            FullName = fullName
+            FullName = trimmedFullName
         };
 
         var createResult = await userManager.CreateAsync(user, password);

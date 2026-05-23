@@ -34,7 +34,18 @@ public sealed class UpdateTaskStatusCommandHandler(
 
         task.ChangeStatus(command.Status, clock.UtcNow);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            // Avoid leaking EF Core into Application layer. Detect EF concurrency exception by type name
+            if (ex.GetType().FullName == "Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException")
+                throw new UseCaseException("The task was modified by another user. Please refresh and try again.");
+
+            throw;
+        }
 
         cache.Remove(CacheKeys.Dashboard);
     }

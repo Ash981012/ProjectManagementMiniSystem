@@ -160,6 +160,70 @@ document.querySelectorAll("[data-auth-form]").forEach(form => {
     validateChangedAuthField(form, event.target);
   });
 
+// Admin edit handling (prefill simple modal / prompt)
+const editModal = document.getElementById('editTaskModal');
+const editForm = document.getElementById('editTaskForm');
+
+async function openEditModal(taskId, rowVersion) {
+  if (!editModal) return;
+
+  editModal.style.display = 'block';
+  editModal.removeAttribute('aria-hidden');
+
+  editForm.querySelector('input[name="taskId"]').value = taskId;
+  editForm.querySelector('input[name="rowVersion"]').value = rowVersion;
+
+  // Load employees for select
+  const select = editForm.querySelector('select[name="assignedEmployeeId"]');
+  select.innerHTML = '';
+  try {
+    const employees = await sendJson('/api/employees', 'GET');
+    employees.forEach(emp => {
+      const opt = document.createElement('option');
+      opt.value = emp.id;
+      opt.textContent = `${emp.name} (${emp.email})`;
+      select.appendChild(opt);
+    });
+  } catch {
+    // ignore if cannot load employees
+  }
+}
+
+document.querySelectorAll('[data-edit-task-id]').forEach(button => {
+  button.addEventListener('click', event => {
+    const id = button.dataset.editTaskId;
+    const rowVersion = button.dataset.rowVersion || document.querySelector(`tr[data-task-id="${id}"]`)?.dataset.rowVersion;
+    openEditModal(id, rowVersion);
+  });
+});
+
+document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', () => {
+  if (!editModal) return;
+  editModal.style.display = 'none';
+  editModal.setAttribute('aria-hidden', 'true');
+}));
+
+if (editForm) {
+  editForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const fd = new FormData(editForm);
+    const id = fd.get('taskId');
+    const payload = {
+      title: fd.get('title'),
+      description: fd.get('description'),
+      assignedEmployeeId: fd.get('assignedEmployeeId'),
+      rowVersion: fd.get('rowVersion')
+    };
+
+    try {
+      await sendJson(`/api/tasks/${id}`, 'PUT', payload);
+      window.location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+}
+
   form.addEventListener("change", event => {
     validateChangedAuthField(form, event.target);
   });
@@ -262,9 +326,11 @@ document.querySelectorAll("[data-task-status]").forEach(button => {
 
     try {
       currentButton.disabled = true;
+      const rowVersion = currentButton.dataset.rowVersion || document.querySelector(`tr[data-task-id="${currentButton.dataset.taskStatus}"]`)?.dataset.rowVersion;
+
       await sendJson(`/api/tasks/${currentButton.dataset.taskStatus}/status`, "PATCH", {
         status: currentButton.dataset.status,
-        rowVersion: currentButton.dataset.rowVersion
+        rowVersion: rowVersion
       });
 
       window.location.reload();

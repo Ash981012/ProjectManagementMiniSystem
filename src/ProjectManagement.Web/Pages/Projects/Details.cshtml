@@ -12,6 +12,7 @@
     <div class="summary-pill">@Model.Project.ProgressPercentage% complete</div>
 </section>
 
+
 <section class="stats-grid">
     <article class="stat-card">
         <span>Total tasks</span>
@@ -76,9 +77,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var task in Model.Project.Tasks)
+                @foreach (var task in Model.Project.Tasks)
                     {
-                        <tr>
+                        <tr data-task-id="@task.Id" data-row-version="@task.RowVersion">
                             <td>
                                 <strong>@task.Title</strong>
                                 <span>@task.Description</span>

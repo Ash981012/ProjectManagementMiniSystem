@@ -243,18 +243,7 @@ public partial class InitialCreate : Migration
             table: "ProjectTasks",
             column: "ProjectId");
 
-        migrationBuilder.CreateIndex(
-            name: "IX_ProjectTasks_AssignedEmployeeId",
-            table: "ProjectTasks",
-            column: "AssignedEmployeeId");
-
-        migrationBuilder.AddForeignKey(
-            name: "FK_ProjectTasks_AspNetUsers_AssignedEmployeeId",
-            table: "ProjectTasks",
-            column: "AssignedEmployeeId",
-            principalTable: "AspNetUsers",
-            principalColumn: "Id",
-            onDelete: ReferentialAction.Restrict);
+        // NOTE: AssignedEmployeeId index and FK are added in a separate migration.
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
